@@ -4,7 +4,7 @@ import {
 } from "@apollo/client";
 
 const apolloClient = new ApolloClient({
-    uri: 'https://48p1r2roz4.sse.codesandbox.io',
+    uri: 'https://fronterappqa.azurewebsites.net/graphql',
     cache: new InMemoryCache()
 });
 
