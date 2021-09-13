@@ -3,6 +3,7 @@
     "@apollo/client": "^3.4.10",
     "@react-navigation/native": "^6.0.2",
     "@react-navigation/stack": "^6.0.7",
+    "emoji-utils": "^1.0.1",
     "expo": "~42.0.0",
     "graphql": "^15.5.2",
     "react": "16.13.1",

@@ -1,12 +1,31 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { View, StyleSheet, Platform, ImageBackground } from 'react-native'
-import { GiftedChat, Bubble, Send, InputToolbar } from 'react-native-gifted-chat'
+import { View, StyleSheet, Platform, ImageBackground, Text } from 'react-native'
+import { GiftedChat, Bubble, Send, InputToolbar, Composer } from 'react-native-gifted-chat'
 import { IconButton } from 'react-native-paper'
 import uuid from 'react-native-uuid'
 import QuickReplies from 'react-native-gifted-chat/lib/QuickReplies'
 
+import PropTypes from 'prop-types'
+import emojiUtils from 'emoji-utils'
+import SlackMessage from './Slack/SlackMessage'
+
 export function ChatRoom({ navigation, route }) {
     const {data} = route.params;
+
+    // const data = {
+    //   login:{
+    //     user: { 
+    //       id: 1,
+    //       firstName: "Eddie",
+    //       lastName: "Perez",
+    //       profile: {
+    //         isVerifiedDocuments: false,
+    //         photo: null,
+    //       }
+    //     }
+    //   }
+    // }
+
     console.log(data.login.user.profile.isVerifiedDocuments)
     const USER = {
       _id: data.login.user.id,
@@ -34,6 +53,25 @@ export function ChatRoom({ navigation, route }) {
       ])
     }, [])
 
+    function renderMessage(props) {
+      const {
+        currentMessage: { text: currText },
+      } = props
+
+      const messageTextStyle = null
+
+      // Make "pure emoji" messages much bigger than plain text.
+      if (currText && emojiUtils.isPureEmojiString(currText)) {
+        messageTextStyle = {
+          fontSize: 28,
+          // Emoji get clipped if lineHeight isn't increased; make it consistent across platforms.
+          lineHeight: Platform.OS === 'android' ? 34 : 30,
+        }
+      }
+
+      return <SlackMessage {...props} messageTextStyle={messageTextStyle} />
+    }
+
     function renderBubble(props) {
       return (
         <Bubble
@@ -60,16 +98,17 @@ export function ChatRoom({ navigation, route }) {
       )
     }
 
-    function renderQuickReplies(props) {
-      return <QuickReplies {...props} color="#696969" />
-    }
-
     function renderInputToolbar(props) {
-    if (stateNoinput !== false) {
-      return <InputToolbar {...props} />
+      if (stateNoinput !== false) {
+        return <InputToolbar {...props} />
+      } else {
+        return( 
+          <View style={styles.ToolbarContainer}>
+              <Text>Verifica tu perfil para poder escribir</Text>
+          </View>
+        )
+      }
     }
-
-  }
 
     const onSend = useCallback((messages = []) => {
       setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
@@ -77,16 +116,15 @@ export function ChatRoom({ navigation, route }) {
 
     return (
       <GiftedChat
-        renderQuickReplies={renderQuickReplies}
-        renderBubble={renderBubble}
+        // renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
+        renderMessage={renderMessage}
         placeholder="Escribir un mensaje..."
         showUserAvatar
         renderAvatarOnTop
         renderSend={renderSend}
         messages={messages}
         onSend={messages => onSend(messages)}
-        onQuickReply={(newQuickReply) => onQuickReply(newQuickReply)}
         user={USER}
       />
     )
@@ -97,4 +135,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  ToolbarContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 })
