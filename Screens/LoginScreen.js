@@ -1,11 +1,24 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, StyleSheet, Text } from 'react-native'
 import { Input, Button } from 'react-native-elements'
 import { gql, useMutation } from '@apollo/client'
 
+import { auth } from '../firebase'
+
 export function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('');
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChange((user) => {
+            if (user) {
+                navigation.navigate('Chat Social', {data: data});
+            } else {
+                // User is signed out
+            }
+        });
+        return unsubscribe
+    }, [])
 
     const LOGIN_USER = gql`
         mutation ($email: String!, $password: String!) {

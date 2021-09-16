@@ -9,6 +9,8 @@ import PropTypes from 'prop-types'
 import emojiUtils from 'emoji-utils'
 import SlackMessage from './Slack/SlackMessage'
 
+import { auth, db } from '../firebase'
+
 export function ChatRoom({ navigation, route }) {
     const {data} = route.params;
 
@@ -26,7 +28,8 @@ export function ChatRoom({ navigation, route }) {
     //   }
     // }
 
-    console.log(data.login.user.profile.isVerifiedDocuments)
+    // console.log(data.login.user.profile.isVerifiedDocuments)
+
     const USER = {
       _id: data.login.user.id,
       name: data.login.user.firstName + ' ' + data.login.user.lastName,
@@ -36,21 +39,25 @@ export function ChatRoom({ navigation, route }) {
     
     const [messages, setMessages] = useState([]);
 
-    console.log(USER);
+    // console.log(USER);
+
+    // console.log(data.login.token);
 
     useEffect(() => {
-      setMessages([
-        {
-          _id: 1,
-          text: 'Hello developer',
-          createdAt: new Date(),
-          user: {
-            _id: 2,
-            name: 'React Native',
-            avatar: 'https://placeimg.com/140/140/any',
-          },
-        },
-      ])
+      // const unsubscribe = auth.signInWithCustomToken(data.login.token)
+      //   .then((userCredential) => {
+      //     // Signed in
+      //     var user = userCredential.user;
+      //     console.log(user);
+      //     console.log('Its Ok...');
+      //     // ...
+      //   })
+      //   .catch((error) => {
+      //     var errorCode = error.code;
+      //     var errorMessage = error.message;
+      //     // ...
+      //   });
+      
     }, [])
 
     function renderMessage(props) {
@@ -70,22 +77,6 @@ export function ChatRoom({ navigation, route }) {
       }
 
       return <SlackMessage {...props} messageTextStyle={messageTextStyle} />
-    }
-
-    function renderBubble(props) {
-      return (
-        <Bubble
-          {...props}
-          wrapperStyle={{
-            right: { backgroundColor: '#696969' },
-            left: { backgroundColor: '#F9B233' },
-          }}
-          textStyle={{
-            right: { color: '#fff' },
-            left: { color: '#fff' },
-          }}
-        />
-      )
     }
 
     function renderSend(props) {
@@ -112,11 +103,22 @@ export function ChatRoom({ navigation, route }) {
 
     const onSend = useCallback((messages = []) => {
       setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
+      const {
+        _id,
+        createdAt,
+        text,
+        user
+      } = messages[0]
+      db.collection('ChatRoom').add({
+        _id,
+        createdAt,
+        text,
+        user,
+      })
     }, [])
 
     return (
       <GiftedChat
-        // renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
         renderMessage={renderMessage}
         placeholder="Escribir un mensaje..."
