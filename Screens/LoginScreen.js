@@ -4,21 +4,79 @@ import { Input, Button } from 'react-native-elements'
 import { gql, useMutation } from '@apollo/client'
 
 import { auth } from '../firebase'
+import { firebase } from '@firebase/app'
 
 export function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('');
 
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChange((user) => {
-            if (user) {
-                navigation.navigate('Chat Social', {data: data});
-            } else {
-                // User is signed out
-            }
-        });
-        return unsubscribe
-    }, [])
+    // const signAnonymous = (data) => {
+    //     auth.signInAnonymously()
+    //         .then(() => {
+                
+    //         })
+    //         .catch((error) => {
+    //             const errorCode = error.code;
+    //             const errorMessage = error.message;
+    //             alert(errorMessage)
+    //         });
+    // }
+
+    // const signOut = () => {
+    //     auth.signOut()
+    //     .then(() => {
+    //         console.log('signOut')
+    //     })
+    //     .catch((error) => {
+    //         const errorCode = error.code;
+    //         const errorMessage = error.message;
+    //         alert(errorMessage)
+    //     });
+    // }
+
+    // const signPersist = (data) => {
+    //     auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
+    //         .then(() => {
+    //             signAnonymous(data);
+    //         })
+    //         .catch((error) => {
+    //             var errorCode = error.code;
+    //             var errorMessage = error.message;
+    //             alert(errorMessage)
+    //         });
+    // }
+
+    // useEffect(() => {
+    //     const unsubscribe = auth.onAuthStateChanged((user) => {
+    //         if (user) {
+    //             // var uid = user.uid;
+    //             console.log(user.uid);
+    //             console.log(data)
+    //             if (data) {
+    //                 signOut();
+    //                 navigation.navigate('Chat Social', {data: data});
+    //             } else {
+    //                 signOut();
+    //             }
+    //         } else {
+
+    //         }
+    //     });
+
+    //     const signPersist = (data) => {
+    //         auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
+    //             .then(() => {
+    //                 signAnonymous();
+    //             })
+    //             .catch((error) => {
+    //                 var errorCode = error.code;
+    //                 var errorMessage = error.message;
+    //                 alert(errorMessage)
+    //             });
+    //         }
+
+    //     return unsubscribe
+    // }, [])
 
     const LOGIN_USER = gql`
         mutation ($email: String!, $password: String!) {
@@ -37,8 +95,9 @@ export function LoginScreen({ navigation }) {
         }
     `
 
-    const [sendDataGraphQL, { data, loading, error }] = useMutation(LOGIN_USER, {
+    const [sendDataGraphQL, {data, loading, error }] = useMutation(LOGIN_USER, {
         onCompleted:(data) => {return navigation.navigate('Chat Social', {data: data})}
+        // onCompleted:() => {signAnonymous()}
     })
         if (loading) {
             return <Text>cargando...</Text>

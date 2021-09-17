@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useLayoutEffect } from 'react'
 import { View, StyleSheet, Platform, ImageBackground, Text } from 'react-native'
 import { GiftedChat, Bubble, Send, InputToolbar, Composer } from 'react-native-gifted-chat'
 import { IconButton } from 'react-native-paper'
@@ -10,9 +10,17 @@ import emojiUtils from 'emoji-utils'
 import SlackMessage from './Slack/SlackMessage'
 
 import { auth, db } from '../firebase'
+import { firebase } from '@firebase/app'
 
 export function ChatRoom({ navigation, route }) {
     const {data} = route.params;
+    const USER = {
+      _id: data.login.user.id,
+      name: data.login.user.firstName + ' ' + data.login.user.lastName,
+      avatar: 'https://fronterapp.blob.core.windows.net/user-documents/' + data.login.user.profile.photo,
+    }
+    const stateNoinput = data.login.user.profile.isVerifiedDocuments
+    const [messages, setMessages] = useState([]);
 
     // const data = {
     //   login:{
@@ -27,21 +35,19 @@ export function ChatRoom({ navigation, route }) {
     //     }
     //   }
     // }
-
     // console.log(data.login.user.profile.isVerifiedDocuments)
 
-    const USER = {
-      _id: data.login.user.id,
-      name: data.login.user.firstName + ' ' + data.login.user.lastName,
-      avatar: 'https://fronterapp.blob.core.windows.net/user-documents/' + data.login.user.profile.photo,
+    const signAnonymous = () => {
+        auth.signInAnonymously()
+            .then(() => {
+                
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                alert(errorMessage)
+            });
     }
-    const stateNoinput = data.login.user.profile.isVerifiedDocuments
-    
-    const [messages, setMessages] = useState([]);
-
-    // console.log(USER);
-
-    // console.log(data.login.token);
 
     useEffect(() => {
       // const unsubscribe = auth.signInWithCustomToken(data.login.token)
@@ -57,16 +63,39 @@ export function ChatRoom({ navigation, route }) {
       //     var errorMessage = error.message;
       //     // ...
       //   });
-      
+
+      const unsubscribe = auth.onAuthStateChanged((user) => {
+        if (user) {
+          // var uid = user.uid;
+          console.log(user.uid);
+          console.log(data)
+          } else {
+            signAnonymous();
+          }
+
+          console.log(db.collection('ChatRoom'));
+
+        });
+        return unsubscribe
+    }, [])
+
+    useLayoutEffect(() => {
+      const unsubscribe = db.collection('ChatRoom').orderBy('createdAt', 'desc').onSnapshot(snapshot => setMessages(
+          snapshot.docs.map(doc => ({
+          _id: doc.data()._id,
+          createdAt: doc.data().createdAt.toDate(),
+          text: doc.data().text,
+          user: doc.data().user,
+        }))
+      ));
+    return unsubscribe;
     }, [])
 
     function renderMessage(props) {
       const {
         currentMessage: { text: currText },
       } = props
-
       const messageTextStyle = null
-
       // Make "pure emoji" messages much bigger than plain text.
       if (currText && emojiUtils.isPureEmojiString(currText)) {
         messageTextStyle = {
@@ -75,7 +104,6 @@ export function ChatRoom({ navigation, route }) {
           lineHeight: Platform.OS === 'android' ? 34 : 30,
         }
       }
-
       return <SlackMessage {...props} messageTextStyle={messageTextStyle} />
     }
 
