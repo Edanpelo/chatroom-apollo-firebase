@@ -22,51 +22,6 @@ export function ChatRoom({ navigation, route }) {
     // const stateNoinput = data.login.user.profile.isVerifiedDocuments
     const [messages, setMessages] = useState([]);
 
-    // const data = {
-    //   login:{
-    //     user: { 
-    //       id: 1,
-    //       firstName: "Eddie",
-    //       lastName: "Perez",
-    //       profile: {
-    //         isVerifiedDocuments: false,
-    //         photo: null,
-    //       }
-    //     }
-    //   }
-    // }
-    // console.log(data.login.user.profile.isVerifiedDocuments)
-
-    // useEffect(() => {
-    //   // const unsubscribe = auth.signInWithCustomToken(data.login.token)
-    //   //   .then((userCredential) => {
-    //   //     // Signed in
-    //   //     var user = userCredential.user;
-    //   //     console.log(user);
-    //   //     console.log('Its Ok...');
-    //   //     // ...
-    //   //   })
-    //   //   .catch((error) => {
-    //   //     var errorCode = error.code;
-    //   //     var errorMessage = error.message;
-    //   //     // ...
-    //   //   });
-
-    //   const unsubscribe = auth.onAuthStateChanged((user) => {
-    //     if (user) {
-    //       // var uid = user.uid;
-    //       console.log(user.uid);
-    //       console.log(data)
-    //       } else {
-    //         signAnonymous();
-    //       }
-
-    //       console.log(db.collection('ChatRoom'));
-
-    //     });
-    //     return unsubscribe
-    // }, [])
-
     useLayoutEffect(() => {
       const unsubscribe = db.collection('ChatRoom').orderBy('createdAt', 'desc').onSnapshot(snapshot => setMessages(
           snapshot.docs.map(doc => ({

@@ -29,10 +29,10 @@ export default class Bubble extends React.Component {
 
   onLongPress() {
     if (this.props.onLongPress) {
-      this.props.onLongPress(this.context, this.props.currentMessage)
+      this.props.onLongPress(this.context, this.props.currentMessage, this.navigation)
     } else {
       if (this.props.currentMessage.text) {
-        const options = ['Copy Text', 'Cancel']
+        const options = ['Copiar texto', 'Denunciar comentario', 'Cancelar']
         const cancelButtonIndex = options.length - 1
         this.context.actionSheet().showActionSheetWithOptions(
           {
@@ -44,6 +44,8 @@ export default class Bubble extends React.Component {
               case 0:
                 Clipboard.setString(this.props.currentMessage.text)
                 break
+              case 1:
+                return this.navigation.navigate('Reportar un Comentario', {data: data})
             }
           },
         )
