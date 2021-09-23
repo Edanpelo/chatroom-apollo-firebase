@@ -19,7 +19,7 @@ export function ChatRoom({ navigation, route }) {
       name: data.login.user.firstName + ' ' + data.login.user.lastName,
       avatar: 'https://fronterapp.blob.core.windows.net/user-documents/' + data.login.user.profile.photo,
     }
-    const stateNoinput = data.login.user.profile.isVerifiedDocuments
+    // const stateNoinput = data.login.user.profile.isVerifiedDocuments
     const [messages, setMessages] = useState([]);
 
     // const data = {
@@ -37,47 +37,35 @@ export function ChatRoom({ navigation, route }) {
     // }
     // console.log(data.login.user.profile.isVerifiedDocuments)
 
-    const signAnonymous = () => {
-        auth.signInAnonymously()
-            .then(() => {
-                
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                alert(errorMessage)
-            });
-    }
+    // useEffect(() => {
+    //   // const unsubscribe = auth.signInWithCustomToken(data.login.token)
+    //   //   .then((userCredential) => {
+    //   //     // Signed in
+    //   //     var user = userCredential.user;
+    //   //     console.log(user);
+    //   //     console.log('Its Ok...');
+    //   //     // ...
+    //   //   })
+    //   //   .catch((error) => {
+    //   //     var errorCode = error.code;
+    //   //     var errorMessage = error.message;
+    //   //     // ...
+    //   //   });
 
-    useEffect(() => {
-      // const unsubscribe = auth.signInWithCustomToken(data.login.token)
-      //   .then((userCredential) => {
-      //     // Signed in
-      //     var user = userCredential.user;
-      //     console.log(user);
-      //     console.log('Its Ok...');
-      //     // ...
-      //   })
-      //   .catch((error) => {
-      //     var errorCode = error.code;
-      //     var errorMessage = error.message;
-      //     // ...
-      //   });
+    //   const unsubscribe = auth.onAuthStateChanged((user) => {
+    //     if (user) {
+    //       // var uid = user.uid;
+    //       console.log(user.uid);
+    //       console.log(data)
+    //       } else {
+    //         signAnonymous();
+    //       }
 
-      const unsubscribe = auth.onAuthStateChanged((user) => {
-        if (user) {
-          // var uid = user.uid;
-          console.log(user.uid);
-          console.log(data)
-          } else {
-            signAnonymous();
-          }
+    //       console.log(db.collection('ChatRoom'));
 
-          console.log(db.collection('ChatRoom'));
-
-        });
-        return unsubscribe
-    }, [])
+    //     });
+    //     return unsubscribe
+    // }, [])
 
     useLayoutEffect(() => {
       const unsubscribe = db.collection('ChatRoom').orderBy('createdAt', 'desc').onSnapshot(snapshot => setMessages(
@@ -95,7 +83,7 @@ export function ChatRoom({ navigation, route }) {
       const {
         currentMessage: { text: currText },
       } = props
-      const messageTextStyle = null
+      var messageTextStyle = null 
       // Make "pure emoji" messages much bigger than plain text.
       if (currText && emojiUtils.isPureEmojiString(currText)) {
         messageTextStyle = {
@@ -118,7 +106,7 @@ export function ChatRoom({ navigation, route }) {
     }
 
     function renderInputToolbar(props) {
-      if (stateNoinput !== false) {
+      if (data.login.user.profile.isVerifiedDocuments !== false) {
         return <InputToolbar {...props} />
       } else {
         return( 

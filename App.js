@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Text } from "react-native";
+import { View, Text, LogBox } from "react-native";
 import { ApolloProvider } from "@apollo/client";
 import { ExchangeRates } from "./GraphQL/queries/ExchangeRates";
 import apolloClient from "./apolloClient";
@@ -8,6 +8,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { LoginScreen } from './Screens/LoginScreen'
 import { ChatRoom }  from './Screens/ChatRoom'
 
+LogBox.ignoreLogs(['Setting a timer for a long period of time'])
 const Stack = createStackNavigator();
 export default function App() {
   return (
